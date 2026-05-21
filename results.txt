@@ -1,0 +1,23 @@
+[ERROR] scanme.nmap.org/admin
+[ERROR] scanme.nmap.org/login
+[ERROR] scanme.nmap.org/dashboard
+[OPEN] Port 22
+[OPEN] Port 80
+[2026-05-21 15:41:02] Started banner grab on example.com:80
+[2026-05-21 15:41:05] HTTP/1.1 403 Forbidden
+Date: Thu, 21 May 2026 12:41:02 GMT
+Content-Type: text/plain; charset=UTF-8
+Content-Length: 16
+Connection: close
+Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Expires: Thu, 01 Jan 1970 00:00:01 GMT
+Referrer-Policy: same-origin
+X-Frame-Options: SAMEORIGIN
+Server: cloudflare
+CF-RAY: 9ff3a72bea34e28d-MRS
+
+
+[2026-05-21 15:42:31] Started directory scan on example.com
+[2026-05-21 15:42:31] [ERROR] example.com/admin
+[2026-05-21 15:42:31] [ERROR] example.com/login
+[2026-05-21 15:42:31] [ERROR] example.com/dashboard

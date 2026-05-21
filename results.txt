@@ -21,3 +21,5 @@ CF-RAY: 9ff3a72bea34e28d-MRS
 [2026-05-21 15:42:31] [ERROR] example.com/admin
 [2026-05-21 15:42:31] [ERROR] example.com/login
 [2026-05-21 15:42:31] [ERROR] example.com/dashboard
+[2026-05-21 15:51:08] Started threaded port scan on example.com
+[2026-05-21 15:51:09] [OPEN] Port 80

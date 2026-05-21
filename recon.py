@@ -1,5 +1,7 @@
 import socket
 import requests
+import threading
+
 from colorama import Fore, init
 from datetime import datetime
 
@@ -19,8 +21,31 @@ def save_result(data):
 
 
 # ==============================
-# PORT SCANNER
+# THREADED PORT SCANNER
 # ==============================
+
+def scan_port(target, port):
+
+    try:
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(0.5)
+
+        result = s.connect_ex((target, port))
+
+        if result == 0:
+
+            result_text = f"[OPEN] Port {port}"
+
+            print(Fore.GREEN + result_text)
+
+            save_result(result_text)
+
+        s.close()
+
+    except:
+        pass
+
 
 def port_scanner():
 
@@ -28,28 +53,22 @@ def port_scanner():
 
     print(Fore.YELLOW + f"\nScanning {target}...\n")
 
-    save_result(f"Started port scan on {target}")
+    save_result(f"Started threaded port scan on {target}")
+
+    threads = []
 
     for port in range(1, 101):
 
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(0.5)
+        thread = threading.Thread(target=scan_port, args=(target, port))
 
-            result = s.connect_ex((target, port))
+        threads.append(thread)
 
-            if result == 0:
+        thread.start()
 
-                result_text = f"[OPEN] Port {port}"
+    for thread in threads:
+        thread.join()
 
-                print(Fore.GREEN + result_text)
-
-                save_result(result_text)
-
-            s.close()
-
-        except:
-            pass
+    print(Fore.CYAN + "\nPort scan complete.\n")
 
 
 # ==============================
@@ -138,7 +157,7 @@ while True:
     print(Fore.MAGENTA + """
 ======== RECON FRAMEWORK ========
 
-1. Port Scanner
+1. Threaded Port Scanner
 2. Directory Scanner
 3. Banner Grabber
 4. Exit

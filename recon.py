@@ -1,12 +1,20 @@
+
 import socket
 import requests
 import threading
+import json
 
 from colorama import Fore, init
 from datetime import datetime
 
 # Initialize colorama
 init()
+
+# ==============================
+# GLOBAL RESULTS STORAGE
+# ==============================
+
+scan_results = []
 
 # ==============================
 # SAVE RESULTS FUNCTION
@@ -16,8 +24,28 @@ def save_result(data):
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    log_entry = f"[{timestamp}] {data}"
+
     with open("results.txt", "a") as file:
-        file.write(f"[{timestamp}] {data}\n")
+        file.write(log_entry + "\n")
+
+    scan_results.append({
+        "timestamp": timestamp,
+        "result": data
+    })
+
+
+# ==============================
+# EXPORT JSON REPORT
+# ==============================
+
+def export_json():
+
+    with open("results.json", "w") as json_file:
+
+        json.dump(scan_results, json_file, indent=4)
+
+    print(Fore.GREEN + "\n[+] JSON report exported successfully.\n")
 
 
 # ==============================
@@ -149,6 +177,58 @@ def banner_grabber():
 
 
 # ==============================
+# SECURITY HEADER SCANNER
+# ==============================
+
+def security_header_scanner():
+
+    target = input("Enter target URL: ")
+
+    print(Fore.YELLOW + f"\nChecking security headers on {target}...\n")
+
+    save_result(f"Started security header scan on {target}")
+
+    try:
+
+        response = requests.get(target)
+
+        headers = response.headers
+
+        security_headers = [
+            "X-Frame-Options",
+            "Content-Security-Policy",
+            "Strict-Transport-Security",
+            "X-Content-Type-Options"
+        ]
+
+        for header in security_headers:
+
+            if header in headers:
+
+                result_text = f"[FOUND] {header}: {headers[header]}"
+
+                print(Fore.GREEN + result_text)
+
+                save_result(result_text)
+
+            else:
+
+                result_text = f"[MISSING] {header}"
+
+                print(Fore.RED + result_text)
+
+                save_result(result_text)
+
+    except:
+
+        error_text = "[ERROR] Failed to scan headers."
+
+        print(Fore.RED + error_text)
+
+        save_result(error_text)
+
+
+# ==============================
 # MAIN MENU
 # ==============================
 
@@ -160,7 +240,9 @@ while True:
 1. Threaded Port Scanner
 2. Directory Scanner
 3. Banner Grabber
-4. Exit
+4. Security Header Scanner
+5. Export JSON Report
+6. Exit
 
 =================================
 """)
@@ -177,6 +259,12 @@ while True:
         banner_grabber()
 
     elif choice == "4":
+        security_header_scanner()
+
+    elif choice == "5":
+        export_json()
+
+    elif choice == "6":
         print(Fore.RED + "Exiting...")
         break
 

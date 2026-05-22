@@ -23,3 +23,16 @@ CF-RAY: 9ff3a72bea34e28d-MRS
 [2026-05-21 15:42:31] [ERROR] example.com/dashboard
 [2026-05-21 15:51:08] Started threaded port scan on example.com
 [2026-05-21 15:51:09] [OPEN] Port 80
+[2026-05-22 18:19:54] Started security header scan on https://example.com
+[2026-05-22 18:19:54] [MISSING] X-Frame-Options
+[2026-05-22 18:19:54] [MISSING] Content-Security-Policy
+[2026-05-22 18:19:54] [MISSING] Strict-Transport-Security
+[2026-05-22 18:19:54] [MISSING] X-Content-Type-Options
+[2026-05-22 18:28:11] Started threaded port scan on scanme.nmap.org
+[2026-05-22 18:28:12] [OPEN] Port 22
+[2026-05-22 18:28:12] [OPEN] Port 80
+[2026-05-22 18:28:44] Started security header scan on https://example.com
+[2026-05-22 18:28:46] [MISSING] X-Frame-Options
+[2026-05-22 18:28:46] [MISSING] Content-Security-Policy
+[2026-05-22 18:28:46] [MISSING] Strict-Transport-Security
+[2026-05-22 18:28:46] [MISSING] X-Content-Type-Options

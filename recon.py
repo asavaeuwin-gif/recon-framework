@@ -1,4 +1,3 @@
-
 import socket
 import requests
 import threading
@@ -7,27 +6,22 @@ import json
 from colorama import Fore, init
 from datetime import datetime
 
-# Initialize colorama
+# Initialize colors
 init()
-
-# ==============================
-# GLOBAL RESULTS STORAGE
-# ==============================
 
 scan_results = []
 
-# ==============================
-# SAVE RESULTS FUNCTION
-# ==============================
+
+# =========================
+# SAVE RESULTS
+# =========================
 
 def save_result(data):
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    log_entry = f"[{timestamp}] {data}"
-
     with open("results.txt", "a") as file:
-        file.write(log_entry + "\n")
+        file.write(f"[{timestamp}] {data}\n")
 
     scan_results.append({
         "timestamp": timestamp,
@@ -35,22 +29,21 @@ def save_result(data):
     })
 
 
-# ==============================
-# EXPORT JSON REPORT
-# ==============================
+# =========================
+# EXPORT JSON
+# =========================
 
 def export_json():
 
-    with open("results.json", "w") as json_file:
+    with open("results.json", "w") as file:
+        json.dump(scan_results, file, indent=4)
 
-        json.dump(scan_results, json_file, indent=4)
-
-    print(Fore.GREEN + "\n[+] JSON report exported successfully.\n")
+    print(Fore.GREEN + "\n[+] JSON report exported.\n")
 
 
-# ==============================
-# THREADED PORT SCANNER
-# ==============================
+# =========================
+# PORT SCANNER
+# =========================
 
 def scan_port(target, port):
 
@@ -81,13 +74,14 @@ def port_scanner():
 
     print(Fore.YELLOW + f"\nScanning {target}...\n")
 
-    save_result(f"Started threaded port scan on {target}")
-
     threads = []
 
     for port in range(1, 101):
 
-        thread = threading.Thread(target=scan_port, args=(target, port))
+        thread = threading.Thread(
+            target=scan_port,
+            args=(target, port)
+        )
 
         threads.append(thread)
 
@@ -96,22 +90,24 @@ def port_scanner():
     for thread in threads:
         thread.join()
 
-    print(Fore.CYAN + "\nPort scan complete.\n")
+    print(Fore.CYAN + "\nScan complete.\n")
 
 
-# ==============================
+# =========================
 # DIRECTORY SCANNER
-# ==============================
+# =========================
 
 def directory_scanner():
 
     target = input("Enter target URL: ")
 
-    wordlist = ["admin", "login", "dashboard"]
+    wordlist = [
+        "admin",
+        "login",
+        "dashboard"
+    ]
 
-    print(Fore.YELLOW + f"\nScanning directories on {target}...\n")
-
-    save_result(f"Started directory scan on {target}")
+    print(Fore.YELLOW + "\nScanning...\n")
 
     for word in wordlist:
 
@@ -121,35 +117,30 @@ def directory_scanner():
 
             response = requests.get(url)
 
-            result_text = f"[{response.status_code}] {url}"
+            result = f"[{response.status_code}] {url}"
 
-            print(Fore.CYAN + result_text)
+            print(Fore.CYAN + result)
 
-            save_result(result_text)
+            save_result(result)
 
         except:
 
-            error_text = f"[ERROR] {url}"
-
-            print(Fore.RED + error_text)
-
-            save_result(error_text)
+            print(Fore.RED + f"[ERROR] {url}")
 
 
-# ==============================
+# =========================
 # BANNER GRABBER
-# ==============================
+# =========================
 
 def banner_grabber():
 
     target = input("Enter target: ")
     port = int(input("Enter port: "))
 
-    save_result(f"Started banner grab on {target}:{port}")
-
     try:
 
         s = socket.socket()
+
         s.settimeout(3)
 
         s.connect((target, port))
@@ -158,35 +149,30 @@ def banner_grabber():
 
         banner = s.recv(1024)
 
-        banner_text = banner.decode(errors="ignore")
+        text = banner.decode(
+            errors="ignore"
+        )
 
-        print(Fore.GREEN + "\n[+] Banner Found:\n")
-        print(Fore.CYAN + banner_text)
+        print(Fore.GREEN + "\nBanner:\n")
 
-        save_result(banner_text)
+        print(Fore.CYAN + text)
+
+        save_result(text)
 
         s.close()
 
     except:
 
-        error_text = "[-] Failed to grab banner."
-
-        print(Fore.RED + error_text)
-
-        save_result(error_text)
+        print(Fore.RED + "Failed.")
 
 
-# ==============================
+# =========================
 # SECURITY HEADER SCANNER
-# ==============================
+# =========================
 
 def security_header_scanner():
 
     target = input("Enter target URL: ")
-
-    print(Fore.YELLOW + f"\nChecking security headers on {target}...\n")
-
-    save_result(f"Started security header scan on {target}")
 
     try:
 
@@ -194,57 +180,105 @@ def security_header_scanner():
 
         headers = response.headers
 
-        security_headers = [
+        checks = [
+
             "X-Frame-Options",
             "Content-Security-Policy",
             "Strict-Transport-Security",
             "X-Content-Type-Options"
+
         ]
 
-        for header in security_headers:
+        print()
+
+        for header in checks:
 
             if header in headers:
 
-                result_text = f"[FOUND] {header}: {headers[header]}"
+                text = f"[FOUND] {header}"
 
-                print(Fore.GREEN + result_text)
+                print(Fore.GREEN + text)
 
-                save_result(result_text)
+                save_result(text)
 
             else:
 
-                result_text = f"[MISSING] {header}"
+                text = f"[MISSING] {header}"
 
-                print(Fore.RED + result_text)
+                print(Fore.RED + text)
 
-                save_result(result_text)
+                save_result(text)
 
     except:
 
-        error_text = "[ERROR] Failed to scan headers."
-
-        print(Fore.RED + error_text)
-
-        save_result(error_text)
+        print(Fore.RED + "Scan failed")
 
 
-# ==============================
-# MAIN MENU
-# ==============================
+# =========================
+# TECHNOLOGY FINGERPRINTER
+# =========================
+
+def technology_fingerprinter():
+
+    target = input("Enter target URL: ")
+
+    try:
+
+        response = requests.get(target)
+
+        headers = response.headers
+
+        print()
+
+        if "Server" in headers:
+
+            text = f"[SERVER] {headers['Server']}"
+
+            print(Fore.GREEN + text)
+
+            save_result(text)
+
+        else:
+
+            print(Fore.RED + "[UNKNOWN SERVER]")
+
+        if "X-Powered-By" in headers:
+
+            text = f"[TECH] {headers['X-Powered-By']}"
+
+            print(Fore.CYAN + text)
+
+            save_result(text)
+
+        else:
+
+            print(Fore.RED + "[TECH UNKNOWN]")
+
+    except:
+
+        print(Fore.RED + "Fingerprint failed")
+
+
+# =========================
+# MENU
+# =========================
 
 while True:
 
     print(Fore.MAGENTA + """
-======== RECON FRAMEWORK ========
+
+====== RECON FRAMEWORK ======
 
 1. Threaded Port Scanner
 2. Directory Scanner
 3. Banner Grabber
 4. Security Header Scanner
-5. Export JSON Report
-6. Exit
+5. Technology Fingerprinter
+6. Export JSON Report
+7. Exit
 
-=================================
+=============================
+
 """)
 
     choice = input("Select option: ")
@@ -262,11 +296,17 @@ while True:
         security_header_scanner()
 
     elif choice == "5":
-        export_json()
+        technology_fingerprinter()
 
     elif choice == "6":
+        export_json()
+
+    elif choice == "7":
+
         print(Fore.RED + "Exiting...")
+
         break
 
     else:
-        print(Fore.RED + "Invalid option.")
+
+        print(Fore.RED + "Invalid option")
